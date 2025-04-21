@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { db } from "../utils/db.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const authRouter = Router();
 
@@ -41,6 +42,7 @@ authRouter.post('/login', async (req,res) => {
             });
         }
 
+
         const isValidpassword = await bcrypt.compare(req.body.password, user.password)
         
         if (!isValidpassword){
@@ -49,13 +51,16 @@ authRouter.post('/login', async (req,res) => {
               }); 
         }
 
+        console.log(process.env.SECRET_KEY)
+
         const token = jwt.sign(
          {id: user._id, firstName: user.firstName, lastName: user.lastName},
          process.env.SECRET_KEY,
          {
             expiresIn: "900000",
         }
-    )
+        )
+
 
     return res.json({
         message: "login succesfully",
